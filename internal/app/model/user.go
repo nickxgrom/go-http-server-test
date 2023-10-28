@@ -20,6 +20,8 @@ func (u *User) BeforeCreate() error {
 		}
 
 		u.EncryptedPassword = enc
+
+		return nil
 	}
 	return errors.New("password must be greater than 0")
 }
