@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -20,7 +21,7 @@ func (u *User) BeforeCreate() error {
 
 		u.EncryptedPassword = enc
 	}
-	return nil
+	return errors.New("password must be greater than 0")
 }
 
 func encryptString(s string) (string, error) {

@@ -77,8 +77,8 @@ func (s *APIServer) userHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "POST":
 		user, err := s.userService.CreateUser(&model.User{
-			Email:             "nxgr.dev@gmail.com",
-			EncryptedPassword: "5658",
+			Email:    "nxgr.dev@gmail.com",
+			Password: "5658",
 		})
 		if err != nil {
 			fmt.Println(err)
