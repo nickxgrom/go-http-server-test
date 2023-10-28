@@ -42,6 +42,6 @@ func (s *Store) User() *UserRepository {
 		return s.UserRepository
 	}
 
-	s.UserRepository = &UserRepository{store: s}
+	s.UserRepository = &UserRepository{Store: s}
 	return s.UserRepository
 }

@@ -5,15 +5,16 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"main/internal/app/model"
+	"main/internal/app/service"
 	"main/internal/app/store"
 	"net/http"
 )
 
 type APIServer struct {
-	config *Config
-	logger *logrus.Logger
-	router *mux.Router
-	store  *store.Store
+	config      *Config
+	logger      *logrus.Logger
+	router      *mux.Router
+	userService *service.UserService
 }
 
 func New(config *Config) *APIServer {
@@ -50,10 +51,15 @@ func (s *APIServer) configureStore() error {
 		return err
 	}
 
-	s.store = st
 	fmt.Println("database connected successfully")
 
+	s.configureServices(st)
+
 	return nil
+}
+
+func (s *APIServer) configureServices(st *store.Store) {
+	s.userService = service.CreateUserService(st)
 }
 
 func (s *APIServer) NewLogger() error {
@@ -70,24 +76,28 @@ func (s *APIServer) NewLogger() error {
 func (s *APIServer) userHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "POST":
-		if user, err := s.store.User().Create(&model.User{
+		user, err := s.userService.CreateUser(&model.User{
 			Email:             "nxgr.dev@gmail.com",
 			EncryptedPassword: "5658",
-		}); err != nil {
+		})
+		if err != nil {
 			fmt.Println(err)
 			w.WriteHeader(500)
 			return
-		} else {
-			fmt.Println(user)
 		}
 
+		fmt.Println(user)
 		w.WriteHeader(200)
 	case "GET":
-		if _, err := fmt.Println(s.store.User().FindByEmail("nxgr2.dev@gmail.com")); err != nil {
-			w.WriteHeader(500)
+		user, err := s.userService.FindUserByEmail("nxgr.dev@gmail.com")
+		if err != nil {
+			w.WriteHeader(404)
 			return
 		}
+
+		fmt.Println(user)
 		w.WriteHeader(200)
+
 	default:
 		w.WriteHeader(400)
 	}
